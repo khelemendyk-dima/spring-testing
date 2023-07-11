@@ -1,4 +1,4 @@
-package com.my.testing.dtos.responses;
+package com.my.testing.payload.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

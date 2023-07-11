@@ -1,4 +1,4 @@
-package com.my.testing.dtos.requests;
+package com.my.testing.payload.requests;
 
 import lombok.Getter;
 import lombok.Setter;

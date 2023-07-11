@@ -1,7 +1,7 @@
 package com.my.testing.utils;
 
-import com.my.testing.dtos.requests.RegisterRequest;
 import com.my.testing.models.User;
+import com.my.testing.payload.requests.RegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;

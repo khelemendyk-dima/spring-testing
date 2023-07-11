@@ -1,12 +1,11 @@
-package com.my.testing.dtos.responses;
+package com.my.testing.payload.responses;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
-public class MessageResponse {
+public class ErrorResponse {
+    private long timestamp;
     private String message;
 }
