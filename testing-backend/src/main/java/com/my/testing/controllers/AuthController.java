@@ -1,15 +1,16 @@
 package com.my.testing.controllers;
 
-import com.my.testing.dtos.requests.LoginRequest;
-import com.my.testing.dtos.requests.RefreshTokenRequest;
-import com.my.testing.dtos.requests.RegisterRequest;
-import com.my.testing.dtos.responses.JwtResponse;
-import com.my.testing.dtos.responses.MessageResponse;
+import com.my.testing.models.PasswordResetToken;
 import com.my.testing.models.RefreshToken;
 import com.my.testing.models.User;
+import com.my.testing.payload.requests.*;
+import com.my.testing.payload.responses.JwtResponse;
+import com.my.testing.payload.responses.MessageResponse;
+import com.my.testing.services.PasswordResetTokenService;
 import com.my.testing.services.RefreshTokenService;
 import com.my.testing.services.UserService;
 import com.my.testing.utils.ConverterUtil;
+import com.my.testing.utils.EmailSenderUtil;
 import com.my.testing.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
+import static com.my.testing.utils.constants.Email.*;
+
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -31,8 +34,10 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
     private final RefreshTokenService refreshTokenService;
+    private final PasswordResetTokenService passwordResetService;
     private final ConverterUtil converterUtil;
     private final JwtUtil jwtUtil;
+    private final EmailSenderUtil emailSender;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
@@ -55,6 +60,10 @@ public class AuthController {
     @PostMapping("/registration")
     public ResponseEntity<MessageResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
         userService.save(converterUtil.convertToUser(registerRequest));
+
+        new Thread(() -> emailSender.sendEmail(registerRequest.getEmail(), SUBJECT_GREETINGS,
+                String.format(MESSAGE_GREETINGS, registerRequest.getFirstName()))).start();
+
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
@@ -78,5 +87,29 @@ public class AuthController {
 
         refreshTokenService.deleteByUserId(userId);
         return ResponseEntity.ok(new MessageResponse("Log out successful"));
+    }
+
+    @PostMapping("/forgot-pass")
+    public ResponseEntity<MessageResponse> sendResetPassTokenToEmail(@RequestBody @Valid ForgotPassRequest request) {
+        User user = userService.findByEmail(request.getEmail());
+
+        PasswordResetToken resetToken = passwordResetService.createResetToken(user);
+
+        new Thread(() -> emailSender.sendEmail(user.getEmail(), SUBJECT_NOTIFICATION,
+                String.format(MESSAGE_RESET_PASSWORD, user.getFirstName(), resetToken.getToken()))).start();
+
+        return ResponseEntity.ok(new MessageResponse("A reset password link has sent to your email. Please check."));
+    }
+
+    @PostMapping("/reset-pass")
+    public ResponseEntity<MessageResponse> resetPassword(@RequestBody @Valid ResetPassRequest request) {
+        PasswordResetToken resetToken = passwordResetService.findByToken(request.getToken());
+        passwordResetService.verifyExpiration(resetToken);
+
+        userService.changeUserPassword(resetToken.getUser(), request.getPassword());
+
+        passwordResetService.deleteById(resetToken.getId());
+
+        return ResponseEntity.ok(new MessageResponse("Password was updated"));
     }
 }

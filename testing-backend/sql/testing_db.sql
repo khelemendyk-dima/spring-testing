@@ -64,26 +64,26 @@ CREATE TABLE `refresh_token` (
                                  UNIQUE KEY `token` (`token`),
                                  UNIQUE KEY `user_id` (`user_id`),
                                  CONSTRAINT `fk_refresh_token_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
 --
--- Dumping data for table `refresh_token`
+-- Table structure for table `password_reset_token`
 --
 
-LOCK TABLES `refresh_token` WRITE;
-/*!40000 ALTER TABLE `refresh_token` DISABLE KEYS */;
-INSERT INTO `refresh_token` VALUES (9,1,'282e927f-ae6d-47f7-9cca-566bdc8e0a1d','2023-07-10 16:36:45');
-/*!40000 ALTER TABLE `refresh_token` ENABLE KEYS */;
-UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+DROP TABLE IF EXISTS `password_reset_token`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `password_reset_token` (
+                                        `id` bigint NOT NULL AUTO_INCREMENT,
+                                        `user_id` bigint NOT NULL,
+                                        `token` varchar(36) NOT NULL,
+                                        `expiry_date` timestamp NOT NULL,
+                                        PRIMARY KEY (`id`),
+                                        UNIQUE KEY `user_id` (`user_id`),
+                                        UNIQUE KEY `token` (`token`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 -- Dump completed on 2023-07-09 19:44:33

@@ -1,10 +1,7 @@
 package com.my.testing.exceptions.handler;
 
-import com.my.testing.dtos.responses.ErrorResponse;
-import com.my.testing.exceptions.RefreshTokenExpiredException;
-import com.my.testing.exceptions.RefreshTokenNotFoundException;
-import com.my.testing.exceptions.UserAlreadyExistsException;
-import com.my.testing.exceptions.UserNotFoundException;
+import com.my.testing.exceptions.*;
+import com.my.testing.payload.responses.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,13 +35,24 @@ public class RestResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {RefreshTokenExpiredException.class,
             RefreshTokenNotFoundException.class})
-    public ResponseEntity<ErrorResponse> handleTokenException(RuntimeException e) {
+    public ResponseEntity<ErrorResponse> handleRefreshTokenException(RuntimeException e) {
         log.error(e.getMessage());
         return new ResponseEntity<>(new ErrorResponse(
                 System.currentTimeMillis(),
                 e.getMessage()
         ), HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(value = {PasswordResetTokenNotFoundException.class,
+            PasswordResetTokenExpiredException.class})
+    public ResponseEntity<ErrorResponse> handlePasswordResetTokenException(RuntimeException e) {
+        log.error(e.getMessage());
+        return new ResponseEntity<>(new ErrorResponse(
+                System.currentTimeMillis(),
+                e.getMessage()
+        ), HttpStatus.BAD_REQUEST);
+    }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
