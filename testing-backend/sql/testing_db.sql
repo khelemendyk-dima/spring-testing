@@ -43,7 +43,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin@gmail.com','$2a$10$YmmsUl1k8di51kAGogitMuI07AlJFYJyqNgdTSzBraZ.TMrNpvYeK','Admin','Adminenko','ROLE_ADMIN'),(2,'student@gmail.com','$2a$10$yVUyhLi3ujBhl7WE5eQHHet51mPBhjsDfgBaLpYC/gfdiaRl7I9H2','Simple','Student','ROLE_STUDENT'),(3,'blocked@gmail.com','$2a$10$lpQ2ya9KD8Ttsp8OC0szQellnR.F9gjaeslzN7j4LkdF7nTVXmlMG','Blocked','Student','ROLE_BLOCKED');
+INSERT INTO `user` VALUES (1,'admin@gmail.com','$2a$10$YmmsUl1k8di51kAGogitMuI07AlJFYJyqNgdTSzBraZ.TMrNpvYeK','Admin','Adminenko','ROLE_ADMIN'),(2,'student@gmail.com','$2a$10$yVUyhLi3ujBhl7WE5eQHHet51mPBhjsDfgBaLpYC/gfdiaRl7I9H2','Simple','Student','ROLE_USER'),(3,'blocked@gmail.com','$2a$10$lpQ2ya9KD8Ttsp8OC0szQellnR.F9gjaeslzN7j4LkdF7nTVXmlMG','Blocked','Student','ROLE_BLOCKED');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
