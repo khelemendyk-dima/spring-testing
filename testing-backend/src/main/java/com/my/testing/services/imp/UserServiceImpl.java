@@ -1,5 +1,6 @@
 package com.my.testing.services.imp;
 
+import com.my.testing.exceptions.PasswordMismatchException;
 import com.my.testing.exceptions.UserAlreadyExistsException;
 import com.my.testing.exceptions.UserNotFoundException;
 import com.my.testing.models.User;
@@ -34,8 +35,29 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void changeUserPassword(User user, String password) {
+    public void changePassword(User user, String password) {
         user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public void changePassword(String email, String oldPass, String newPass) {
+        User user = findByEmail(email);
+
+        if (!passwordEncoder.matches(oldPass, user.getPassword()))
+            throw new PasswordMismatchException("Old password doesn't match.");
+
+        user.setPassword(passwordEncoder.encode(newPass));
+        userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public void changeRole(String email, Role role) {
+        User user = findByEmail(email);
+
+        user.setRole(role);
         userRepository.save(user);
     }
 
@@ -52,5 +74,17 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return userRepository.save(user);
+    }
+
+    @Transactional
+    @Override
+    public User update(String oldEmail, User user) {
+        User userToUpdate = findByEmail(oldEmail);
+
+        userToUpdate.setEmail(user.getEmail());
+        userToUpdate.setFirstName(user.getFirstName());
+        userToUpdate.setLastName(user.getLastName());
+
+        return userRepository.save(userToUpdate);
     }
 }

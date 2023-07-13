@@ -106,7 +106,7 @@ public class AuthController {
         PasswordResetToken resetToken = passwordResetService.findByToken(request.getToken());
         passwordResetService.verifyExpiration(resetToken);
 
-        userService.changeUserPassword(resetToken.getUser(), request.getPassword());
+        userService.changePassword(resetToken.getUser(), request.getPassword());
 
         passwordResetService.deleteById(resetToken.getId());
 

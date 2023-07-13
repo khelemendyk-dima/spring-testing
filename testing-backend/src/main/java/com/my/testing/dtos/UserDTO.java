@@ -1,0 +1,30 @@
+package com.my.testing.dtos;
+
+import com.my.testing.models.enums.Role;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+@Getter
+@Setter
+public class UserDTO {
+    private Long id;
+
+    @Email(message = "Email must be valid")
+    @Size(min = 3, max = 255, message = "Email must be between 3 and 255 characters")
+    @NotBlank(message = "Email must not be empty")
+    private String email;
+
+    @Size(min = 2, max = 35, message = "First name must be between 2 and 35 characters")
+    @NotBlank(message = "First name must not be empty")
+    private String firstName;
+
+    @Size(min = 2, max = 35, message = "Last name must be between 2 and 35 characters")
+    @NotBlank(message = "Last name must not be empty")
+    private String lastName;
+
+    private Role role;
+}

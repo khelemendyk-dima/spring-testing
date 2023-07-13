@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.Objects;
 
 @Slf4j
@@ -53,6 +54,21 @@ public class RestResponseEntityExceptionHandler {
         ), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<Object> handleIntegrityConstraintViolation() {
+        return new ResponseEntity<>(new ErrorResponse(
+                System.currentTimeMillis(),
+                "Email already exists."
+        ), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<ErrorResponse> handlePasswordMismatchException(PasswordMismatchException e) {
+        return new ResponseEntity<>(new ErrorResponse(
+                System.currentTimeMillis(),
+                e.getMessage()
+        ), HttpStatus.CONFLICT);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
