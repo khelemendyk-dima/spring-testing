@@ -4,6 +4,7 @@ import com.my.testing.models.PasswordResetToken;
 import com.my.testing.models.RefreshToken;
 import com.my.testing.models.User;
 import com.my.testing.payload.requests.*;
+import com.my.testing.payload.responses.AuthResponse;
 import com.my.testing.payload.responses.JwtResponse;
 import com.my.testing.payload.responses.MessageResponse;
 import com.my.testing.services.PasswordResetTokenService;
@@ -40,7 +41,7 @@ public class AuthController {
     private final EmailSenderUtil emailSender;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> authenticateUser(@RequestBody @Valid LoginRequest loginRequest) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(
                         loginRequest.getEmail(),
@@ -50,21 +51,29 @@ public class AuthController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = (User) authentication.getPrincipal();
-
-        String accessToken = jwtUtil.generateJwtToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user.getId());
 
-        return ResponseEntity.ok(new JwtResponse(accessToken, refreshToken.getToken()));
+        return ResponseEntity.ok(AuthResponse.builder()
+                .accessToken(jwtUtil.generateJwtToken(user))
+                .refreshToken(refreshToken.getToken())
+                .user(converterUtil.convertToUserDTO(user))
+                .build());
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<MessageResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
-        userService.save(converterUtil.convertToUser(registerRequest));
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
+        User registeredUser = userService.save(converterUtil.convertToUser(registerRequest));
 
         new Thread(() -> emailSender.sendEmail(registerRequest.getEmail(), SUBJECT_GREETINGS,
                 String.format(MESSAGE_GREETINGS, registerRequest.getFirstName()))).start();
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(registeredUser.getId());
+
+        return ResponseEntity.ok(AuthResponse.builder()
+                .accessToken(jwtUtil.generateJwtToken(registeredUser))
+                .refreshToken(refreshToken.getToken())
+                .user(converterUtil.convertToUserDTO(registeredUser))
+                .build());
     }
 
     @PostMapping("/refresh-token")
